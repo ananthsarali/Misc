@@ -1,0 +1,70 @@
+JWT Creation Utility
+jwt-creation-utility uses jsonwebtoken express and exposes an API for creating JWT's. This utility endpoint can be used in testing and pnv automation.
+
+Documentation
+Pre Requisites
+Download node from below link
+
+https://nodejs.org/en/
+
+Install and Configure
+Run npm install for downloading dependant libraries
+
+Run node accessjwt.js for starting server
+
+Updating Enviornments
+In accessjwt.js add the below statement for each enviornment. var {env name} = fs.readFileSync("{env name}.key");. Key needs to be present in the ROOT directory and needs to be in RSA format.
+
+Example:
+
+var st2 = fs.readFileSync("st2.key");
+
+Endpoint Details
+By default server starts with 8889 port but you can change it by passing process.env.PORT
+
+Request
+POST /api/{env}/request/object/{kid}
+Path Parameters
+Parameter	Type	Mandatory	Description
+env	string	Yes	Enviornment Name. Supported: vag,st2,sit3,pnv,ict1,ict2
+kid	string	Yes	Kid for creating the JWT.
+Headers
+Parameter	Type	Mandatory	Description
+Content-Type	application/json	Yes	Input body content type
+sign	string	No	Algorithm for creating JWT. Default: RS256 Supported: RS256, PS256
+type	string	No	Custom JWT Types for use cases. Default: Input body Supported: register, request-object
+Body
+JWT Contents
+
+Example:
+
+{
+  "sub": "anz-f1NwDrkJQPoh5D4Ght6fUK",
+  "iss": "anz-f1NwDrkJQPoh5D4Ght6fUK",
+  "aud": "https://amst2.service.dev:443/openam/oauth2/realms/root/realms/anz/realms/web",
+  "jti": "d2976c06-9512-4404-9272-318fada20c7b"
+}
+Response
+{
+  "out" : string
+}
+Sample Request:
+
+POST /api/{env}/request/object/{kid}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "sub": "anz-f1NwDrkJQPoh5D4Ght6fUK",
+  "iss": "anz-f1NwDrkJQPoh5D4Ght6fUK",
+  "aud": "https://amst2.service.dev:443/openam/oauth2/realms/root/realms/anz/realms/web",
+  "jti": "d2976c06-9512-4404-9272-318fada20c7b"
+}
+Sample Successful Response:
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "out": "eyJhbGciOiJQUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ilp3N1pHTGxuQ2VleXV5djBpRTF0ZzBPejdyST0ifQ.eyJzdWIiOiJhbnotZjFOd0Rya0pRUG9oNUQ0R2h0NmZVSyIsImlzcyI6ImFuei1mMU53RHJrSlFQb2g1RDRHaHQ2ZlVLIiwiYXVkIjoiaHR0cHM6Ly9hbXN0Mi5zZXJ2aWNlLmRldjo0NDMvb3BlbmFtL29hdXRoMi9yZWFsbXMvcm9vdC9yZWFsbXMvYW56L3JlYWxtcy93ZWIiLCJqdGkiOiJkMjk3NmMwNi05NTEyLTQ0MDQtOTI3Mi0zMThmYWRhMjBjN2IiLCJleHAiOjE1Nzk4NDAyNDEsImlhdCI6MTU3OTgzOTI0MH0.o29u14ClEVT_YiyFd7rKGljDqAjNq2_XFsrMVGH5puJZ3sih7TiF6A4JIUB9X5AYmDySs7LJkhNW4jEPhEMDl_L4MggkqQI29bA3ogNnd5AQmoQe38149yTUF5zWuct-Z7nYQiUbXef3tR921JaBtbHSzbM31SLfwNOzEiX30jqMyBoTXiEkTs2F6IMaNXcXVi9mkn-h5duvBQC9UwoBS_q_OW_gmMAJSrDUjfxwo0pWBJNuVM8QIkS7wo28YMMSZ2LcoaYUjisD88rNrAEe-1ksPiPMt-BfvWL3hJB8aD-0m7_5ZHSGdtt-TO6ggr76CM3CrInjWxhhhaNd97_mxg"
+}
