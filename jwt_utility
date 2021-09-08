@@ -1,0 +1,64 @@
+# Name of the file is accessjwt.js
+var jwt = require('jsonwebtoken');
+var fs = require('fs');
+var express = require('express'), bodyParser = require('body-parser');
+var app = express();
+app.use(bodyParser.json());
+
+
+var st2 = fs.readFileSync("st2.key");  // get private key
+
+var vagrant = fs.readFileSync("vag.key");  // get private key
+
+var sit3 = fs.readFileSync("sit3.key");  // get private key
+
+var ict2 = fs.readFileSync("ict2.key");  // get private key
+
+var ict1 = fs.readFileSync("ict1.key");  // get private key
+
+var pnv = fs.readFileSync("pnv.key");  // get private key
+
+var router = express.Router();          // get an instance of the express Router
+
+
+
+router.use(function(req, res, next) {
+    next();
+});
+
+router.post('/:env/request/object/:kid', function(req, res) {
+   var head = {kid:req.params.kid}
+   var signhead = req.headers['sign'] == null ? 'RS256' : req.headers['sign']
+   var type = req.headers['type'] == "request-object" ? 'ro' : "exp"
+   type = req.headers['type'] == "register" ? 'register' : type
+   var env = req.params.env
+   var d = new Date();
+   var seconds = Math.round(d.getTime() / 1000);
+   if(type == 'exp'){
+    req.body.exp = seconds+1000
+   }
+   var env = req.params.env
+   var signer = eval(env)
+   if(type == 'register'){
+    req.body.exp = seconds+1000
+    var response = {out:jwt.sign(req.body, signer, { algorithm: signhead, header: head, noTimestamp: false})}
+   }
+   else{
+    var response = {out:jwt.sign(req.body, signer, { algorithm: signhead, header: head, noTimestamp: true})}
+   }
+    res.json(response);   
+});
+
+app.use('/api', router);
+
+var port = process.env.PORT || 8889;
+
+var server = app.listen(port, function () {
+
+  var host = server.address().address
+  var port = server.address().port
+
+  
+  console.log("App listening at http://%s:%s", host, port)
+
+})
